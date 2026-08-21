@@ -128,7 +128,6 @@
     <div class="flow-icon icon-pv">☀️</div>
     <div class="flow-label">Panneaux</div>
     <div class="flow-value" id="pvPower">-- kW</div>
-    <div class="flow-sub" id="energyToday">-- kWh aujourd'hui</div>
   </div>
 
   <div class="flow-card">
@@ -217,7 +216,6 @@
       document.getElementById("batIcon").textContent = isCharging ? "🔋⚡" : "🔋";
 
       document.getElementById("pvPower").textContent = fmtKw(data.pv_power_kw);
-      document.getElementById("energyToday").textContent = (data.energy_today_kwh || 0).toFixed(1) + " kWh aujourd'hui";
       document.getElementById("loadPower").textContent = fmtKw(data.load_power_kw);
       document.getElementById("gridExport").textContent = fmtKw(data.power_to_grid_kw);
       document.getElementById("gridImport").textContent = fmtKw(data.power_to_user_kw);
