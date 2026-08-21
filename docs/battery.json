@@ -1,5 +1,5 @@
 {
   "success": false,
-  "updated_at": "2026-08-19T00:00:00+00:00",
-  "error": "Pas encore de données, attends la première exécution du workflow."
+  "updated_at": "2026-08-21T07:56:05.896814+00:00",
+  "error": "Expecting value: line 3 column 1 (char 2)"
 }
