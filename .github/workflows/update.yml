@@ -2,7 +2,7 @@ name: Update battery data
 
 on:
   schedule:
-    # Toutes les 10 minutes. GitHub peut retarder un peu l'exécution
+    # Toutes les 5 minutes. GitHub peut retarder un peu l'exécution
     # réelle en période de forte charge, c'est normal.
     - cron: "*/5 * * * *"
   workflow_dispatch: {}  # permet de lancer manuellement depuis l'onglet Actions
