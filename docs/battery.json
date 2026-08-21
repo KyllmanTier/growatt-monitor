@@ -1,12 +1,16 @@
 {
   "success": true,
-  "updated_at": "2026-08-21T09:47:34.718880+00:00",
-  "soc": 16,
-  "pv_power_kw": 1.28,
-  "energy_today_kwh": 0.0,
+  "updated_at": "2026-08-21T10:12:10.077169+00:00",
+  "soc": 19,
+  "pv_power_kw": 4.635,
+  "load_power_kw": 1.1255,
   "power_to_grid_kw": 0.0,
-  "power_to_user_kw": 0.02,
-  "bat_power_kw": -0.2,
-  "bat_voltage": 51.6,
-  "load_power_kw": 1.1
+  "power_to_user_kw": 0.10690000000000001,
+  "bat_power_kw": -3.1686,
+  "bat_voltage": 52.8,
+  "energy_today_kwh": 3.9000000953674316,
+  "self_consumption_today_kwh": 3.200000047683716,
+  "grid_import_today_kwh": 15.0,
+  "grid_export_today_kwh": 0.0,
+  "status": "Operating"
 }
