@@ -1,12 +1,12 @@
 {
   "success": true,
-  "updated_at": "2026-08-21T08:58:26.457902+00:00",
-  "soc": 13,
-  "pv_power_kw": 2.76,
+  "updated_at": "2026-08-21T09:02:53.769977+00:00",
+  "soc": 14,
+  "pv_power_kw": 1.46,
   "energy_today_kwh": 0.0,
   "power_to_grid_kw": 0.0,
   "power_to_user_kw": 0.0,
-  "bat_power_kw": -1.53,
+  "bat_power_kw": -0.42,
   "bat_voltage": 51.5,
-  "load_power_kw": 1.23
+  "load_power_kw": 1.04
 }
