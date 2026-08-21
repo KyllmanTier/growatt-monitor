@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Onduleur solaire</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Solaire">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0b0f14;
+    color: #f2f2f2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 20px 40px;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 500;
+    color: #9aa5b1;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+  }
+
+  .gauge-wrap {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    margin-bottom: 8px;
+  }
+  svg { transform: rotate(-90deg); }
+  .gauge-bg { fill: none; stroke: #1c2733; stroke-width: 14; }
+  .gauge-fg {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease, stroke 0.6s ease;
+  }
+  .gauge-center {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .soc-value { font-size: 46px; font-weight: 600; line-height: 1; }
+  .soc-unit { font-size: 16px; color: #9aa5b1; margin-top: 4px; }
+  .status-row { font-size: 14px; color: #9aa5b1; margin-bottom: 28px; text-align: center; }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .flow-card {
+    background: #141b23;
+    border: 0.5px solid #232f3b;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .flow-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .flow-label { font-size: 12px; color: #9aa5b1; }
+  .flow-value { font-size: 20px; font-weight: 600; }
+  .flow-sub { font-size: 11px; color: #5b6673; margin-top: -2px; }
+
+  .icon-pv { background: rgba(232, 185, 62, 0.15); color: #e8b93e; }
+  .icon-home { background: rgba(70, 140, 230, 0.15); color: #6ba3ec; }
+  .icon-export { background: rgba(62, 207, 142, 0.15); color: #3ecf8e; }
+  .icon-import { background: rgba(226, 86, 79, 0.15); color: #e2564f; }
+
+  .updated-at { margin-top: 26px; font-size: 12px; color: #5b6673; text-align: center; }
+  .error-banner {
+    background: #3a1f1f;
+    border: 0.5px solid #5a2c2c;
+    color: #f2b8b8;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-top: 20px;
+    max-width: 340px;
+    text-align: center;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Installation solaire</h1>
+
+<div class="gauge-wrap">
+  <svg viewBox="0 0 190 190" width="190" height="190">
+    <circle class="gauge-bg" cx="95" cy="95" r="82"></circle>
+    <circle id="gaugeFg" class="gauge-fg" cx="95" cy="95" r="82"
+            stroke="#3ecf8e"
+            stroke-dasharray="515.2"
+            stroke-dashoffset="515.2"></circle>
+  </svg>
+  <div class="gauge-center">
+    <div class="soc-value" id="socValue">--</div>
+    <div class="soc-unit">% batterie</div>
+  </div>
+</div>
+<div class="status-row" id="statusRow">Chargement...</div>
+
+<div class="flow-grid">
+  <div class="flow-card">
+    <div class="flow-icon icon-pv">☀️</div>
+    <div class="flow-label">Panneaux</div>
+    <div class="flow-value" id="pvPower">-- kW</div>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-icon icon-home">🏠</div>
+    <div class="flow-label">Maison</div>
+    <div class="flow-value" id="loadPower">-- kW</div>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-icon icon-export">⇥</div>
+    <div class="flow-label">Injecté réseau</div>
+    <div class="flow-value" id="gridExport">-- kW</div>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-icon icon-import">⇤</div>
+    <div class="flow-label">Soutiré réseau</div>
+    <div class="flow-value" id="gridImport">-- kW</div>
+  </div>
+
+  <div class="flow-card" style="grid-column: 1 / -1;">
+    <div class="flow-icon" id="batIcon">🔋</div>
+    <div class="flow-label">Batterie</div>
+    <div class="flow-value" id="batPower">-- kW</div>
+    <div class="flow-sub" id="batVoltage"></div>
+  </div>
+</div>
+
+<div class="updated-at" id="updatedAt"></div>
+<div class="error-banner" id="errorBanner"></div>
+
+<script>
+  const CIRCUMFERENCE = 515.2;
+
+  function formatRelativeTime(isoString) {
+    const then = new Date(isoString);
+    const now = new Date();
+    const diffMin = Math.round((now - then) / 60000);
+    if (diffMin < 1) return "à l'instant";
+    if (diffMin === 1) return "il y a 1 minute";
+    if (diffMin < 60) return `il y a ${diffMin} minutes`;
+    const diffH = Math.round(diffMin / 60);
+    return `il y a ${diffH} h`;
+  }
+
+  function socColor(soc) {
+    if (soc >= 60) return "#3ecf8e";
+    if (soc >= 30) return "#e8b93e";
+    return "#e2564f";
+  }
+
+  function fmtKw(value) {
+    return Math.abs(value).toFixed(2) + " kW";
+  }
+
+  async function refresh() {
+    const errorBanner = document.getElementById("errorBanner");
+    try {
+      const res = await fetch("battery.json?t=" + Date.now(), { cache: "no-store" });
+      const data = await res.json();
+
+      if (!data.success) {
+        errorBanner.style.display = "block";
+        errorBanner.textContent = "Accès Growatt indisponible — vérifie le token/cookie.";
+        document.getElementById("statusRow").textContent = "Données indisponibles";
+        return;
+      }
+      errorBanner.style.display = "none";
+
+      const soc = data.soc;
+      document.getElementById("socValue").textContent = soc;
+      const offset = CIRCUMFERENCE * (1 - soc / 100);
+      const fg = document.getElementById("gaugeFg");
+      fg.style.strokeDashoffset = offset;
+      fg.setAttribute("stroke", socColor(soc));
+
+      const batPower = data.bat_power_kw;
+      const isCharging = batPower < 0;
+      const isIdle = Math.abs(batPower) < 0.05;
+      document.getElementById("statusRow").textContent =
+        isIdle ? "Batterie au repos" : (isCharging ? "Batterie en charge" : "Batterie en décharge");
+      document.getElementById("batPower").textContent =
+        (isIdle ? "" : (isCharging ? "+ " : "− ")) + fmtKw(batPower);
+      document.getElementById("batVoltage").textContent =
+        data.bat_voltage.toFixed(1) + " V";
+      document.getElementById("batIcon").textContent = isCharging ? "🔋⚡" : "🔋";
+
+      document.getElementById("pvPower").textContent = fmtKw(data.pv_power_kw);
+      document.getElementById("loadPower").textContent = fmtKw(data.load_power_kw);
+      document.getElementById("gridExport").textContent = fmtKw(data.power_to_grid_kw);
+      document.getElementById("gridImport").textContent = fmtKw(data.power_to_user_kw);
+
+      document.getElementById("updatedAt").textContent =
+        "Mis à jour " + formatRelativeTime(data.updated_at);
+
+    } catch (e) {
+      errorBanner.style.display = "block";
+      errorBanner.textContent = "Impossible de charger les données.";
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 30000);
+</script>
+
+</body>
+</html>
