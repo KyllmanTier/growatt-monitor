@@ -2,7 +2,7 @@ name: Update battery data
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/10 * * * *"
 
   workflow_dispatch:
 
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -31,7 +33,7 @@ jobs:
           GROWATT_WIT_SN: ${{ secrets.GROWATT_WIT_SN }}
         run: python scripts/fetch_battery.py
 
-         - name: Commit and push if changed
+      - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -40,10 +42,11 @@ jobs:
 
           if git diff --staged --quiet; then
             echo "Aucun changement à enregistrer."
-          else
-            git commit -m "Update battery data"
-
-            git pull --rebase origin main
-
-            git push
+            exit 0
           fi
+
+          git commit -m "Update battery data"
+
+          git pull --rebase origin main
+
+          git push origin main
