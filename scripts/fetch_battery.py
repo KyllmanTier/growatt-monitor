@@ -4,6 +4,9 @@ import sys
 from datetime import datetime, timezone
 
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 TOKEN = os.environ["GROWATT_TOKEN"]
 WIT_SN = os.environ["GROWATT_WIT_SN"]
