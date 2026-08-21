@@ -55,32 +55,35 @@ def main():
         bat_power = float(obj.get("batPower", 0))       # négatif = charge, positif = décharge
         power_to_grid = float(obj.get("pactogrid", 0))  # injecté sur le réseau
         power_to_user = float(obj.get("pactouser", 0))  # soutiré du réseau
+        e_today = float(obj.get("eToday", 0))           # production du jour en kWh
 
         output = {
             "success": True,
             "updated_at": now,
             "soc": int(obj.get("SOC", 0)),
             "pv_power_kw": float(obj.get("ppv", 0)),
+            "energy_today_kwh": e_today,
             "power_to_grid_kw": power_to_grid,
             "power_to_user_kw": power_to_user,
             "bat_power_kw": bat_power,
             "bat_voltage": float(obj.get("vBat", 0)),
             "load_power_kw": float(obj.get("pLocalLoad", 0)),
         }
-        print(f"OK — SOC: {output['soc']}% | PV: {output['pv_power_kw']} kW | "
-              f"Maison: {output['load_power_kw']} kW")
+
     except Exception as e:
-        # On écrit quand même un fichier, avec l'erreur, pour que la page
-        # web puisse afficher un message clair (ex: "session expirée")
         output = {
             "success": False,
             "updated_at": now,
             "error": str(e),
         }
-        print(f"ERREUR : {e}", file=sys.stderr)
 
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
+        json.dump(output, f, indent=2, ensure_ascii=False)
+
+    if not output["success"]:
+        print(f"Erreur : {output['error']}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
